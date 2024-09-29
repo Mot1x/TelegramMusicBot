@@ -5,6 +5,7 @@ import music_handlers
 import re
 import aiogram.filters
 
+from database import add_row
 from aiogram import Bot, html, F, Router
 from aiogram.filters import CommandStart, Command, Filter
 from aiogram.types import Message, InlineKeyboardMarkup, CallbackQuery, FSInputFile
@@ -56,14 +57,24 @@ async def get_previous_page(callback: CallbackQuery) -> None:
 @router.callback_query(lambda callback: re.fullmatch(r'download [0-9]+', callback.data))
 async def download_track(callback: CallbackQuery) -> None:
 
-    id = int(callback.data.split()[-1])
-    file_path = music_handlers.download_track(id)
-    telegram_file_name = music_handlers.get_telegram_file_name(id)
-    if id:
+    track_id = int(callback.data.split()[-1])
+    #тут надо закончить
+    file_path = music_handlers.download_track(track_id)
+    telegram_file_name = music_handlers.get_telegram_file_name(track_id)
+    if track_id:
         await callback.answer('')
-        await callback.message.answer_audio(FSInputFile(file_path), title=telegram_file_name)
+        message = await callback.message.answer_audio(FSInputFile(file_path), title=telegram_file_name)
+        message_id = message.message_id
+        chat_id = message.chat.id
+        await add_row(track_id, chat_id, message_id)
+
     else:
         await callback.answer('')
+
+
+async def forward_track(track_id: int) -> None:
+    #TODO
+    yield
 
 
 # @router.message()

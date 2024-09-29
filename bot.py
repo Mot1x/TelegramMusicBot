@@ -3,6 +3,7 @@ import logging
 import os
 import sys
 
+from database import create_table
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
@@ -17,6 +18,7 @@ dp = Dispatcher()
 
 async def main() -> None:
     dp.include_router(router)
+    await create_table()
     await dp.start_polling(bot)
 
 
