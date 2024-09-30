@@ -1,10 +1,7 @@
-import subprocess
-import sys
 import os
 
 from pathlib import Path
 from typing import Union
-
 from yandex_music import Client, Track, Album
 from dotenv import load_dotenv
 
@@ -17,7 +14,7 @@ client = Client(token=TOKEN)
 client.init()
 
 
-def search_tracks(query):
+def search_tracks(query: str) -> list[Track]:
     result = []
 
     for current_page in range(5):
@@ -29,12 +26,12 @@ def search_tracks(query):
     return result
 
 
-def get_telegram_file_name(track_id: int):
+def get_telegram_file_name(track_id: int) -> str:
     track = client.tracks([track_id])[0]
     return f"{', '.join(track.artists_name())} — {track.title}.mp3"
 
 
-def download_track(track_id: Union[int, str]):
+def download_track(track_id: Union[int, str]) -> str:
     track = client.tracks([track_id])[0]
     file_path = download_path / f'{track_id}.mp3'
     track.download(str(file_path), bitrate_in_kbps=320)

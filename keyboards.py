@@ -1,17 +1,17 @@
 from math import ceil
-
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, KeyboardButton, ReplyKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 from yandex_music import SearchResult, Track, Album
 
 
-async def get_start_keyboard():
+async def get_start_keyboard() -> ReplyKeyboardMarkup:
     keyboard = ReplyKeyboardBuilder()
     keyboard.add(KeyboardButton(text='Найти песню 🎧'))
     return keyboard.as_markup(resize_keyboard=True)
 
 
-async def get_search_result_keyboard(tracks: list[Track], current_page=1, track_count_per_page=5):
+async def get_search_result_keyboard(tracks: list[Track], current_page=1,
+                                     track_count_per_page=5) -> InlineKeyboardMarkup | None:
     if not tracks or track_count_per_page <= 0:
         return None
 
