@@ -3,6 +3,8 @@ import sys
 import os
 
 from pathlib import Path
+from typing import Union
+
 from yandex_music import Client, Track, Album
 from dotenv import load_dotenv
 
@@ -29,17 +31,17 @@ def search_tracks(query):
 
 def get_telegram_file_name(track_id: int):
     track = client.tracks([track_id])[0]
-    return f'{', '.join(track.artists_name())} — {track.title}.mp3'
+    return f"{', '.join(track.artists_name())} — {track.title}.mp3"
 
 
-def download_track(track_id: int | str):
+def download_track(track_id: Union[int, str]):
     track = client.tracks([track_id])[0]
     file_path = download_path / f'{track_id}.mp3'
     track.download(str(file_path), bitrate_in_kbps=320)
     return str(file_path)
 
 
-def delete_track(track_id: int | str):
+def delete_track(track_id: Union[int, str]):
     file_path = download_path / f'{track_id}.mp3'
     os.remove(str(file_path))
 

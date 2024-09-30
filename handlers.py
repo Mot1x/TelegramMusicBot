@@ -5,7 +5,7 @@ import music_handlers
 import re
 import aiogram.filters
 
-from database import add_row
+from database import add_row, get_ids_by_track_id
 from aiogram import Bot, html, F, Router
 from aiogram.filters import CommandStart, Command, Filter
 from aiogram.types import Message, InlineKeyboardMarkup, CallbackQuery, FSInputFile
@@ -56,30 +56,21 @@ async def get_previous_page(callback: CallbackQuery) -> None:
 
 @router.callback_query(lambda callback: re.fullmatch(r'download [0-9]+', callback.data))
 async def download_track(callback: CallbackQuery) -> None:
-
     track_id = int(callback.data.split()[-1])
-    #тут надо закончить
-    file_path = music_handlers.download_track(track_id)
-    telegram_file_name = music_handlers.get_telegram_file_name(track_id)
-    if track_id:
+    other_ids = await get_ids_by_track_id(track_id)
+
+    if other_ids:
+        await callback.answer('')
+        message_id = other_ids.message_id
+        chat_id = other_ids.chat_id
+        await callback.bot.forward_message(chat_id=callback.message.chat.id, from_chat_id=chat_id,
+                                           message_id=message_id)
+    else:
+        file_path = music_handlers.download_track(track_id)
+        telegram_file_name = music_handlers.get_telegram_file_name(track_id)
+
         await callback.answer('')
         message = await callback.message.answer_audio(FSInputFile(file_path), title=telegram_file_name)
         message_id = message.message_id
         chat_id = message.chat.id
         await add_row(track_id, chat_id, message_id)
-
-    else:
-        await callback.answer('')
-
-
-async def forward_track(track_id: int) -> None:
-    #TODO
-    yield
-
-
-# @router.message()
-# async def echo_handler(message: Message) -> None:
-#    try:
-#        await message.send_copy(chat_id=message.chat.id)
-#    except TypeError:
-#        await message.answer("Nice try!")

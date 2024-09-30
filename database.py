@@ -1,8 +1,10 @@
 import asyncio
+from typing import Optional
 
 from sqlalchemy import URL, text, create_engine, Table, MetaData, Column, Integer, String, BigInteger
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import sessionmaker, Session, declarative_base
+from sqlalchemy import select
 
 from config import settings
 
@@ -42,5 +44,14 @@ async def create_table():
     async with engine.connect() as conn:
         await conn.run_sync(metadata.create_all)
         await conn.commit()
+
+
+async def get_ids_by_track_id(track_id: int) -> Optional[IDs]:
+    async with async_session() as session:
+        async with session.begin():
+            stmt = select(IDs).where(IDs.track_id == track_id)
+            result = await session.execute(stmt)
+            ids = result.scalar_one_or_none()
+            return ids
 
 

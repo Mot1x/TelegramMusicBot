@@ -25,7 +25,7 @@ async def get_search_result_keyboard(tracks: list[Track], current_page=1, track_
         if track_count_per_page * (current_page - 1) > number:
             continue
 
-        keyboard.add(InlineKeyboardButton(text=f'{', '.join(track.artists_name())} — {track.title}',
+        keyboard.add(InlineKeyboardButton(text=f"{', '.join(track.artists_name())} — {track.title}",
                                           callback_data=f'download {track.id}'))
         if (number + 1) % 5 == 0:
             break
