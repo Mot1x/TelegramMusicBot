@@ -15,6 +15,7 @@ async def get_search_result_keyboard(tracks: list[Track], current_page=1,
     if not tracks or track_count_per_page <= 0:
         return None
 
+    tracks_per_message = 5
     keyboard = InlineKeyboardBuilder()
     page_count = ceil(len(tracks) / track_count_per_page)
 
@@ -27,7 +28,7 @@ async def get_search_result_keyboard(tracks: list[Track], current_page=1,
 
         keyboard.add(InlineKeyboardButton(text=f"{', '.join(track.artists_name())} — {track.title}",
                                           callback_data=f'download {track.id}'))
-        if (number + 1) % 5 == 0:
+        if (number + 1) % tracks_per_message == 0:
             break
 
     keyboard.add(InlineKeyboardButton(text='<', callback_data=f'goto {current_page - 1}'))
