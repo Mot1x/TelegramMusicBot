@@ -1,7 +1,6 @@
-from typing import Optional
-from sqlalchemy import URL, text, create_engine, Table, MetaData, Column, Integer, String, BigInteger, select
+from sqlalchemy import Table, MetaData, Column, Integer, BigInteger, select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from sqlalchemy.orm import sessionmaker, Session, declarative_base
+from sqlalchemy.orm import declarative_base
 from settings import Settings
 
 engine = create_async_engine(url=Settings().database_url_asyncpg, echo=True)
@@ -38,12 +37,10 @@ async def create_table():
         await conn.commit()
 
 
-async def get_ids_by_track_id(track_id: int) -> Optional[IDs]:
+async def get_ids_by_track_id(track_id: int) -> IDs | None:
     async with async_session() as session:
         async with session.begin():
             stmt = select(IDs).where(IDs.track_id == track_id)
             result = await session.execute(stmt)
-            ids = result.scalar_one_or_none()
-            return ids
-
+            return result.scalar_one_or_none()
 

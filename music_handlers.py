@@ -1,16 +1,13 @@
-import os
-
 from pathlib import Path
 from typing import Union
-from yandex_music import Client, Track, Album
-from dotenv import load_dotenv
+from yandex_music import Client, Track
+from settings import settings
 
-load_dotenv('.env')
-TOKEN = os.getenv('YANDEX_TOKEN')
+yandex_token = settings.yandex_token
 download_path = Path(__file__).parent / 'downloads'
 Path(download_path).mkdir(parents=True, exist_ok=True)
 
-client = Client(token=TOKEN)
+client = Client(token=yandex_token)
 client.init()
 
 
@@ -38,9 +35,9 @@ def download_track(track_id: Union[int, str]) -> str:
     return str(file_path)
 
 
-def delete_track(track_id: Union[int, str]):
+def delete_track(track_id: int | str):
     file_path = download_path / f'{track_id}.mp3'
-    os.remove(str(file_path))
+    file_path.unlink()
 
 
 

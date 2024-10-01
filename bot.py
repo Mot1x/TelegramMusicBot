@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import os
 import sys
 
 from database import create_table
@@ -8,11 +7,10 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from handlers import router
-from dotenv import load_dotenv
+from settings import settings
 
-load_dotenv('.env')
-TOKEN = os.getenv('BOT_TOKEN')
-bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+bot_token = settings.bot_token
+bot = Bot(token=bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
 
 
@@ -28,5 +26,3 @@ if __name__ == "__main__":
         asyncio.run(main())
     except KeyboardInterrupt:
         print("Exit")
-
-

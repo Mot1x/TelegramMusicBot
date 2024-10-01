@@ -1,7 +1,7 @@
 from math import ceil
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, KeyboardButton, ReplyKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
-from yandex_music import SearchResult, Track, Album
+from yandex_music import Track
 
 
 async def get_start_keyboard() -> ReplyKeyboardMarkup:

@@ -4,9 +4,9 @@ import music_handlers
 import re
 
 from database import add_row, get_ids_by_track_id
-from aiogram import Bot, html, F, Router
-from aiogram.filters import CommandStart, Command, Filter
-from aiogram.types import Message, InlineKeyboardMarkup, CallbackQuery, FSInputFile
+from aiogram import html, F, Router
+from aiogram.filters import CommandStart, Command
+from aiogram.types import Message, CallbackQuery, FSInputFile
 
 router = Router()
 search_result = None
@@ -27,17 +27,17 @@ async def get_help(message: Message) -> None:
 async def request_name(message: Message) -> None:
     await message.answer(f"Введи название песни, которую хочешь скачать")
 
-@router.message()
-async def get_tracks_list(message: Message) -> None:
-    global search_result
-    search_result = music_handlers.search_tracks(message.text)
+    @router.message()
+    async def get_tracks_list(message: Message) -> None:
+        global search_result
+        search_result = music_handlers.search_tracks(message.text)
 
-    if not search_result:
-        await message.answer(f"Такой песни нет в каталоге :(")
-        return
+        if not search_result:
+            await message.answer(f"Такой песни нет в каталоге :(")
+            return
 
-    await message.answer(f"Выбери песню из предложенных",
-                         reply_markup=await keyboards.get_search_result_keyboard(search_result))
+        await message.answer(f"Выбери песню из предложенных",
+                             reply_markup=await keyboards.get_search_result_keyboard(search_result))
 
 
 @router.callback_query(lambda callback: re.fullmatch(r'goto [0-9]+', callback.data))
