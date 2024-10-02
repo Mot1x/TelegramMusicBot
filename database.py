@@ -24,14 +24,14 @@ class IDs(Base):
     message_id = Column(BigInteger, index=True)
 
 
-async def add_row(track_id: int, chat_id: int, message_id: int):
+async def add_row(track_id: int, chat_id: int, message_id: int) -> None:
     async with async_session() as session:
         new_row = IDs(track_id=track_id, chat_id=chat_id, message_id=message_id)
         session.add(new_row)
         await session.commit()
 
 
-async def create_table():
+async def create_table() -> None:
     async with engine.connect() as conn:
         await conn.run_sync(metadata.create_all)
         await conn.commit()

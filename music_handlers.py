@@ -13,8 +13,9 @@ client.init()
 
 def search_tracks(query: str) -> list[Track]:
     result = []
+    page_count = 5
 
-    for current_page in range(5):
+    for current_page in range(page_count):
         page_tracks = client.search(query, page=current_page, type_='track').tracks
         if not page_tracks:
             break
@@ -28,16 +29,14 @@ def get_telegram_file_name(track_id: int) -> str:
     return f"{', '.join(track.artists_name())} — {track.title}.mp3"
 
 
-def download_track(track_id: Union[int, str]) -> str:
+def download_track(track_id: int | str) -> str:
     track = client.tracks([track_id])[0]
     file_path = download_path / f'{track_id}.mp3'
     track.download(str(file_path), bitrate_in_kbps=320)
     return str(file_path)
 
 
-def delete_track(track_id: int | str):
+def delete_track(track_id: int | str) -> None:
     file_path = download_path / f'{track_id}.mp3'
-    file_path.unlink()
-
-
-
+    if file_path.exists():
+        file_path.unlink()

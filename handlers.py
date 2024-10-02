@@ -3,13 +3,21 @@ import keyboards
 import music_handlers
 import re
 
+from re import Pattern
 from database import add_row, get_ids_by_track_id
 from aiogram import html, F, Router
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, CallbackQuery, FSInputFile
+from dataclasses import dataclass
 
 router = Router()
 search_result = None
+
+
+@dataclass(frozen=True)
+class Patterns:
+    goto: Pattern[str] = re.compile(r'goto [0-9]+')
+    download: Pattern[str] = re.compile(r'download [0-9]+')
 
 
 @router.message(CommandStart())
@@ -40,7 +48,7 @@ async def request_name(message: Message) -> None:
                              reply_markup=await keyboards.get_search_result_keyboard(search_result))
 
 
-@router.callback_query(lambda callback: re.fullmatch(r'goto [0-9]+', callback.data))
+@router.callback_query(lambda callback: re.fullmatch(Patterns.goto, callback.data))
 async def get_previous_page(callback: CallbackQuery) -> None:
     global search_result
     page = int(callback.data.split()[-1])
@@ -52,7 +60,7 @@ async def get_previous_page(callback: CallbackQuery) -> None:
     await callback.answer('')
 
 
-@router.callback_query(lambda callback: re.fullmatch(r'download [0-9]+', callback.data))
+@router.callback_query(lambda callback: re.fullmatch(Patterns.download, callback.data))
 async def download_track(callback: CallbackQuery) -> None:
     track_id = int(callback.data.split()[-1])
     other_ids = await get_ids_by_track_id(track_id)
