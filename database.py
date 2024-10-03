@@ -1,18 +1,17 @@
-from sqlalchemy import Table, MetaData, Column, Integer, BigInteger, select
+from sqlalchemy import Table, MetaData, Column, Integer, BigInteger, String, select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import declarative_base
 from settings import Settings
 
-engine = create_async_engine(url=Settings().database_url_asyncpg, echo=True)
+engine = create_async_engine(url=Settings().database_url_asyncpg)
 metadata = MetaData()
+ids = Table('ids', metadata,
+            Column('id', Integer, primary_key=True),
+            Column('track_id', BigInteger),
+            Column('chat_id', BigInteger),
+            Column('message_id', BigInteger),
+            Column('file_id', String))
 async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-ids = Table(
-    'ids', metadata,
-    Column('id', Integer, primary_key=True),
-    Column('track_id', BigInteger),
-    Column('chat_id', BigInteger),
-    Column('message_id', BigInteger)
-)
 Base = declarative_base()
 
 
@@ -22,11 +21,12 @@ class IDs(Base):
     track_id = Column(BigInteger, index=True)
     chat_id = Column(BigInteger, index=True)
     message_id = Column(BigInteger, index=True)
+    file_id = Column(String, index=True)
 
 
-async def add_row(track_id: int, chat_id: int, message_id: int) -> None:
+async def add_row(track_id: int, chat_id: int, message_id: int, file_id: str) -> None:
     async with async_session() as session:
-        new_row = IDs(track_id=track_id, chat_id=chat_id, message_id=message_id)
+        new_row = IDs(track_id=track_id, chat_id=chat_id, message_id=message_id, file_id=file_id)
         session.add(new_row)
         await session.commit()
 
