@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     db_name: str
     bot_token: str
     yandex_token: str
+    storage_chat_id: int
 
     class Config:
         env_file = ('db.env', '.env')

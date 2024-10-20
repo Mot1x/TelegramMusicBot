@@ -1,3 +1,5 @@
+import asyncio
+
 from sqlalchemy import Table, MetaData, Column, Integer, BigInteger, String, select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import declarative_base
@@ -24,11 +26,12 @@ class IDs(Base):
     file_id = Column(String, index=True)
 
 
-async def add_row(track_id: int, chat_id: int, message_id: int, file_id: str) -> None:
+async def add_row(track_id: int, chat_id: int, message_id: int, file_id: str) -> IDs:
     async with async_session() as session:
         new_row = IDs(track_id=track_id, chat_id=chat_id, message_id=message_id, file_id=file_id)
         session.add(new_row)
         await session.commit()
+        return new_row
 
 
 async def create_table() -> None:
@@ -43,4 +46,3 @@ async def get_ids_by_track_id(track_id: int) -> IDs | None:
             stmt = select(IDs).where(IDs.track_id == track_id)
             result = await session.execute(stmt)
             return result.scalar_one_or_none()
-

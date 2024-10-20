@@ -9,7 +9,7 @@ async def get_start_keyboard() -> ReplyKeyboardMarkup:
     keyboard.add(KeyboardButton(text='Найти песню 🎧'))
     keyboard.add(KeyboardButton(text='Найти альбом 💿'))
     keyboard.add(KeyboardButton(text='Найти артиста 👤'))
-    keyboard.add(KeyboardButton(text='Чарты 🏆'))
+    keyboard.add(KeyboardButton(text='Чарт 🏆'))
     return keyboard.adjust(2).as_markup(resize_keyboard=True)
 
 
