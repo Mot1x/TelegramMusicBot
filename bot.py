@@ -8,7 +8,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from handlers import router
 from settings import settings
-
+from additional_classes import setup_logger
 bot_token = settings.bot_token
 bot = Bot(token=bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
@@ -22,7 +22,7 @@ async def main() -> None:
 
 if __name__ == "__main__":
     try:
-        logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+        setup_logger()
         asyncio.run(main())
     except KeyboardInterrupt:
-        print("Exit")
+        logging.info("Program interrupted by KeyboardInterrupt")

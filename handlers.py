@@ -1,8 +1,12 @@
 import html
+
+from aiogram.exceptions import TelegramBadRequest
+
 import keyboards
 import music_handlers
 import re
 import os
+import logging
 
 from settings import settings
 from database import add_row, get_ids_by_track_id
@@ -11,7 +15,9 @@ from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, CallbackQuery, FSInputFile, InputMediaAudio, URLInputFile, InlineQuery, \
     InlineQueryResultArticle, InputTextMessageContent, InlineQueryResultAudio, InlineKeyboardMarkup, \
     InlineKeyboardButton, InlineQueryResultCachedAudio
-from additional_classes import Patterns, TrackMetadata, Labels
+from additional_classes import Patterns, TrackMetadata, Labels, setup_logger
+
+setup_logger()
 
 router = Router()
 current_search_type = 'track'
@@ -51,7 +57,7 @@ async def request(message: Message) -> None:
 @router.message()
 async def get_list(message: Message) -> None:
     if message.audio:
-        print(0, message.chat.id, message.message_id, message.audio.file_id)
+        logging.info(f'{0} {message.chat.id} {message.message_id} {message.audio.file_id}')
     await get_list_of_items(current_search_type, message)
 
 
@@ -132,7 +138,7 @@ async def inline_send_track(query: InlineQuery):
         search_id = str(track.id)
         performers = ', '.join(track.artists_name())
         thumb_url = music_handlers.get_track_thumb(track.id)
-        print(track.title, ', '.join(track.artists_name()))
+        logging.info(f'{track.title} {', '.join(track.artists_name())}')
         if ids:
             results.append(InlineQueryResultAudio(
                 id=search_id,
@@ -160,8 +166,10 @@ async def inline_send_track(query: InlineQuery):
                 ),
                 callback_data=f"download track {track.id}"
             ))
-    await query.answer(results, cache_time=1, next_offset=str(current_page + 1))
-
+    try:
+        await query.answer(results, cache_time=1, next_offset=str(current_page + 1))
+    except TelegramBadRequest:
+        logging.info("Inline query was too long")
 
 async def get_list_of_items(item_type: str, message: Message) -> None:
     if item_type not in Labels.__dict__.keys():
@@ -240,8 +248,6 @@ def split_tracks_into_chunks(tracks_data: list[TrackMetadata]):
 
     while len(tracks_data_copy) > 0:
         chunk_size = get_chunk_size(tracks_data_copy)
-
-        print(chunk_size, len(tracks_data_copy))
         yield tracks_data_copy[:chunk_size]
         tracks_data_copy = tracks_data_copy[chunk_size:]
 
