@@ -1,4 +1,6 @@
-cd TelegramBot
-git pull origin main
+cd ~/TelegramBot/
+git pull origin master
 pip install -r requirements.txt
-pm2 restart bot.py
+cd ../../etc/systemd/system/
+systemctl stop telemusicbot.service
+systemctl start telemusicbot.service
