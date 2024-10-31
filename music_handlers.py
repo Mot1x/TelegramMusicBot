@@ -1,11 +1,16 @@
 import asyncio
 import html
+import logging
 
 from pathlib import Path
 from typing import Any
+
+import yandex_music.exceptions
 from yandex_music import ClientAsync, Track, Album, Artist, Chart, ChartInfo, Playlist, TrackShort
 from settings import settings
+from additional_classes import setup_logger
 
+setup_logger()
 yandex_token = settings.yandex_token
 download_path = Path(__file__).parent / 'downloads'
 Path(download_path).mkdir(parents=True, exist_ok=True)
@@ -24,7 +29,11 @@ async def search(item_type: str, query: str, start_page=0, page_count=5) -> list
     result = []
 
     for current_page in range(start_page, start_page + page_count):
-        page = await client.search(query, page=current_page, type_=item_type)
+        try:
+            page = await client.search(query, page=current_page, type_=item_type)
+        except yandex_music.exceptions.BadRequestError as e:
+            logging.info(f'{e}: Inline query was started')
+            break
 
         if item_type == 'track':
             page = page.tracks
@@ -72,7 +81,7 @@ async def download_track(track_id: int | str, path: Path = download_path) -> str
 
     if not file_path.exists():
         await track.download_async(str(file_path), bitrate_in_kbps=320)
-    print(f"{', '.join(track.artists_name())} — {track.title}")
+    logging.info(f"{', '.join(track.artists_name())} — {track.title}")
     return str(file_path)
 
 

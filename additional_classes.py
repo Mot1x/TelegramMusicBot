@@ -1,8 +1,18 @@
+import logging
 import re
+import sys
 from re import Pattern
 from dataclasses import dataclass
 from types import MappingProxyType
 from aiogram.types import InputMediaAudio
+
+
+def setup_logger():
+    logging.basicConfig(format='%(asctime)s - %(message)s',
+                        filemode='a',
+                        filename='bot.log',
+                        level=logging.INFO,
+                        datefmt='%Y-%m-%d %H:%M:%S')
 
 
 @dataclass(frozen=True)
