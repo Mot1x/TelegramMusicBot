@@ -30,7 +30,12 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           eval $(ssh-agent -s)
           ssh-add ~/.ssh/id_rsa
+          
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -t rsa 95.181.160.230 >> ~/.ssh/known_hosts
 
       - name: Deploy to remote server
         run: |
-          ssh root@95.181.160.230 'bash -s' < deploy.sh
+          ssh -o StrictHostKeyChecking=no root@95.181.160.230 'bash -s' < deploy.sh
