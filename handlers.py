@@ -138,7 +138,7 @@ async def inline_send_track(query: InlineQuery):
         search_id = str(track.id)
         performers = ', '.join(track.artists_name())
         thumb_url = music_handlers.get_track_thumb(track.id)
-        logging.info(f'{track.title} {', '.join(track.artists_name())}')
+        logging.info(f"{track.title} {', '.join(track.artists_name())}")
         if ids:
             results.append(InlineQueryResultAudio(
                 id=search_id,
